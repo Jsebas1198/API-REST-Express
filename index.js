@@ -2,7 +2,8 @@ const express = require('express');
 const routerApi = require('./routes');
 const app = express();
 const port = 3000;
-
+//middleware for post method
+app.use(express.json());
 app.get('/', (req, res) => {
   res.send('Hello World!, my first server on EXPRESS');
 });

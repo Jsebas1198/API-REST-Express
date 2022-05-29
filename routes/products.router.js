@@ -21,11 +21,41 @@ router.get('/filter', (req, res) => {
 //esto es dinamico
 router.get('/:id', (req, res) => {
   const { id } = req.params;
+  if (id === '999') {
+    res.status(404).send('Error 404');
+  } else {
+    res.status(200).json({
+      id,
+      name: 'Product 1',
+      price: 10,
+    });
+  }
+});
+
+router.post('/', (req, res) => {
+  const body = req.body;
+  res.status(201).json({
+    message: 'created',
+    data: body,
+  });
+});
+//for domentation convention patch will be the one that updates an specific field of the object
+router.patch('/:id', (req, res) => {
+  const { id } = req.params;
+  const body = req.body;
   res.json({
+    message: 'update',
+    data: body,
     id,
-    name: 'Product 1',
-    price: 10,
   });
 });
 
+//delete will eliminate the object
+router.delete('/:id', (req, res) => {
+  const { id } = req.params;
+  res.json({
+    message: 'delete',
+    id,
+  });
+});
 module.exports = router;
