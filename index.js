@@ -2,6 +2,14 @@ const express = require('express');
 const routerApi = require('./routes');
 const app = express();
 const port = 3000;
+//error middleware
+
+const {
+  logErrors,
+  errorHandler,
+  boomErrorHandler,
+} = require('./middlewares/error.handler');
+
 //middleware for post method
 app.use(express.json());
 app.get('/', (req, res) => {
@@ -9,6 +17,11 @@ app.get('/', (req, res) => {
 });
 
 routerApi(app);
+
+//it should be in a secuential order and ager the router
+app.use(logErrors);
+app.use(boomErrorHandler);
+app.use(errorHandler);
 
 // app.get('/categories', (req, res) => {
 //   res.send('Hello World!');
