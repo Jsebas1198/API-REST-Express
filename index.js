@@ -1,7 +1,8 @@
 const express = require('express');
 const routerApi = require('./routes');
 const app = express();
-const port = 3000;
+//we assing the process.env.PORT to the variable port so it is dinamic an heroku can deploy the app
+const port = process.env.PORT || 3000;
 //error middleware
 
 const {
