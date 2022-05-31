@@ -7,9 +7,10 @@ function validatorHandler(schema, property) {
     //if data is get => req.query or req.params
     //the data is dinamic thats the reason we send it like this
     const data = req[property];
-    const { error } = schema.validate(data);
+    //with abortEarly it sends  all the errors that it founds at the same time
+    const { error } = schema.validate(data, { abortEarly: false });
     if (error) {
-      next(boom.badRequest(error.details[0].message));
+      next(boom.badRequest(error));
     }
     next();
   };

@@ -9,11 +9,41 @@ const {
   errorHandler,
   boomErrorHandler,
 } = require('./middlewares/error.handler');
-
+const cors = require('cors');
 //middleware for post method
 app.use(express.json());
+
+//we  create a whitelist of origins that are allowed to access the api
+const whitelist = [
+  'http://localhost:3000',
+  'http://localhost:8080',
+  'http://127.0.0.1:5500',
+  'http://myapp.com',
+];
+
+const options = {
+  origin: function (origin, callback) {
+    //|| !origin is for cors to accept the same origin request
+    if (whitelist.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+};
+
+//cors function as a middleware, for this configurations we accept any origin that calls the api
+// app.use(cors());
+
+//with this configuration we control who can access our api
+app.use(cors(options));
+
 app.get('/', (req, res) => {
   res.send('Hello World!, my first server on EXPRESS');
+});
+
+app.get('/new-route', (req, res) => {
+  res.send('Hi, a new route');
 });
 
 routerApi(app);

@@ -1,5 +1,13 @@
 const express = require('express');
 const productsService = require('./../services/product.services');
+
+const validatorHandler = require('./../middlewares/validator.handler');
+//each endpoint need to define which is its schema
+const {
+  createProductSchema,
+  updateProductSchema,
+  getProductSchema,
+} = require('./../schemas/product.schema');
 // const { faker } = require('@faker-js/faker');
 const router = express.Router();
 const service = new productsService();
@@ -34,55 +42,69 @@ router.get('/filter', (req, res) => {
 
 //this is dinamic
 //we  are going to use next parameter to use the next error middleware
-router.get('/:id', async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const product = await service.findOne(id);
-    res.json(product);
-  } catch (err) {
-    //here we use the error middleware
-    next(err);
+router.get(
+  '/:id',
+  //before the error middleware we call the validator middleware
+  validatorHandler(getProductSchema, 'params'),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const product = await service.findOne(id);
+      res.json(product);
+    } catch (err) {
+      //here we use the error middleware
+      next(err);
+    }
+
+    // if (id === '999') {
+    //   res.status(404).send('Error 404');
+    // } else {
+    //   res.status(200).json({
+    //     id,
+    //     name: 'Product 1',
+    //     price: 10,
+    //   });
+    // }
   }
+);
 
-  // if (id === '999') {
-  //   res.status(404).send('Error 404');
-  // } else {
-  //   res.status(200).json({
-  //     id,
-  //     name: 'Product 1',
-  //     price: 10,
-  //   });
-  // }
-});
-
-router.post('/', async (req, res) => {
-  const body = req.body;
-  const newProduct = await service.create(body);
-  res.json(newProduct);
-  // res.status(201).json({
-  //   message: 'created',
-  //   data: body,
-  // });
-});
+router.post(
+  '/',
+  validatorHandler(createProductSchema, 'body'),
+  async (req, res) => {
+    const body = req.body;
+    const newProduct = await service.create(body);
+    res.json(newProduct);
+    // res.status(201).json({
+    //   message: 'created',
+    //   data: body,
+    // });
+  }
+);
 
 //for documentation convention, patch will be the one that updates an specific field of the object
-router.patch('/:id', async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const body = req.body;
-    const product = await service.update(id, body);
-    res.json(product);
-  } catch (err) {
-    // res.status(404).json({ error: err.message });
-    next(err);
-  }
+router.patch(
+  '/:id',
+  validatorHandler(getProductSchema, 'params'),
+  validatorHandler(updateProductSchema, 'body'),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const body = req.body;
+      const product = await service.update(id, body);
+      res.json(product);
+    } catch (err) {
+      // res.status(404).json({ error: err.message });
+      next(err);
+    }
 
-  //   {
-  //   message: 'update',
-  //   data: body,
-  //   id,
-  // });
-});
+    //   {
+    //   message: 'update',
+    //   data: body,
+    //   id,
+    // });
+  }
+);
 
 //delete will eliminate the object
 router.delete('/:id', async (req, res) => {
